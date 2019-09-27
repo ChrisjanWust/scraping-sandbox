@@ -2,7 +2,9 @@
 
 ### Requirements
 
-Only requirement is `scrapy`. I'm specifically running v1.5.1 - anything newer should be fine.
+Python 3.6+
+
+Only module required is `scrapy`. I'm specifically running v1.5.1 - anything newer should be fine.
 
 ### Run
 
@@ -62,4 +64,3 @@ The output should be a list of item dictionaries, such as:
 ```
 
 The data isn't fully cleaned yet, which is fine. The goal, for now, is just to get structured data for further local parsing.
-
