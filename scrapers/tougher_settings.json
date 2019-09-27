@@ -1,0 +1,12 @@
+{
+  "ROTATING_PROXY_LIST": ["proxy.proxycrawl.com:9000"],
+  "DOWNLOADER_MIDDLEWARES": {
+    "scrapy.downloadermiddlewares.useragent.UserAgentMiddleware": null,
+    "scrapy_useragents.downloadermiddlewares.useragents.UserAgentsMiddleware": 500,
+    "rotating_proxies.middlewares.RotatingProxyMiddleware": 610,
+    "rotating_proxies.middlewares.BanDetectionMiddleware": 620,
+    "scrapy.downloadermiddlewares.httpcache.HttpCacheMiddleware": null,
+    "scrapers.custom_httpcache.CustomHttpCacheMiddleware": 900
+  },
+  "CONCURRENT_REQUESTS_PER_DOMAIN": 1
+}
