@@ -9,70 +9,6 @@ class HiddenContentException(Exception):
 
 class MainPage(Page):
 
-    """ DEPRECATING
-    def get_subsubcategory_url(self, category_path):
-        category_path = list(category_path)  # needed to list arithmetic
-        category_path = category_path + [''] * (3 - len(category_path))  # fill in if full category path not specified
-        xpath = \
-            f'//div[contains(@class, "sub-nav") and contains(div[contains(@class, "title")]/text(),"{category_path[0]}")]' \
-            f'//span[contains(@class, "sub-nav") and contains(li/a/text(),"{category_path[1]}")]' \
-            f'//ul/li/a[contains(text(),"{category_path[2]}") and not(contains(text(),"See all"))]/@href'
-        url = self.body.xpath(xpath).get()
-        if not url:
-            raise RuntimeError(f"Couldn't find a URL for category path {category_path}\nTried xpath:\n{xpath}")
-        return url
-    """
-
-    """ DEPRECATING
-    def get_category_url(self, category_path):
-        subcategory_urls = []
-        subsubcategory_urls = []
-
-        category_path = list(category_path)  # needed to list arithmetic
-        category_path = category_path + [''] * (3 - len(category_path))  # fill in if full category path not specified
-
-        subcategory_xpath = f'//div[contains(@class, "sub-nav") and contains(div[contains(@class, "title")]/text(),"{category_path[0]}")]' \
-            f'//span[contains(@class, "sub-nav") and contains(li/a/text(),"{category_path[1]}")]'
-
-        if category_path[1] and category_path[2]:
-            subsubcategory_xpath = subcategory_xpath + f'//ul/li/a[contains(text(),"{category_path[2]}") and not(contains(text(),"See all"))]/@href'
-            urls = self.body.xpath(subsubcategory_xpath).getall()
-            if len(urls) == 1:
-                return subcategory_urls
-    """
-
-    """ DEPRECATING    
-    def get_subcategory_urls(self, category_path):
-        category_path = list(category_path)  # needed to list arithmetic
-        category_path = category_path + [''] * (2 - len(category_path))  # fill in if full category path not specified
-
-        subcategory_xpath = \
-            f'//div[contains(@class, "sub-nav") and contains(div[contains(@class, "title")]/text(),"{category_path[0]}")]' \
-                f'//span[contains(@class, "sub-nav") and contains(li/a/text(),"{category_path[1]}")]/li/a/@href'
-
-        return self.body.xpath(subcategory_xpath).getall()
-    """
-
-
-
-
-    """ DEPRECATING
-    def get_category_urls_2(self, category_path):
-        category_path = list(category_path)  # require list arithmetic functions
-        category_path = category_path + [''] * (3 - len(category_path))  # fill in if full category path not specified
-
-        subsubcategory_urls = []
-        subcategory_urls = []
-
-        subcategory_xpath = f'//div[contains(@class, "sub-nav") and contains(div[contains(@class, "title")]/text(),"{category_path[0]}")]' \
-            f'//span[contains(@class, "sub-nav") and contains(li/a/text(),"{category_path[1]}")]'
-
-        subcategories = self.body.xpath(subcategory_xpath)
-
-        for subcategory in subcategories:
-            pass
-    """
-
     def get_subcategory_urls(self, category_path):
         xpath = f'//div[contains(@class, "sub-nav") and contains(div[contains(@class, "title")]/text(),"{category_path[0]}")]//span[contains(@class, "sub-nav")]/li/a'
         if category_path[1]:
@@ -81,23 +17,6 @@ class MainPage(Page):
         xpath += '/@href'
 
         return self.body.xpath(xpath).getall()
-
-    """
-    def get_subcategory_url(self, category_path):
-        return self.body.xpath(f'//div[contains(@class, "sub-nav") and contains(div[contains(@class, "title")]/text(),"{category_path[0]}")]'
-                              f'//span[contains(@class, "sub-nav")]//a[normalize-space()="{category_path[1]}"]/@href').get()
-
-    """
-
-    '''
-    def get_all_subcategory_urls(self, category_path):
-        """
-        Similar to get_subcategory_url, but when the subcategory isn't specified
-        :param category_path: 
-        :return: 
-        """
-        return self.body.xpath(f'//div[contains(@class, "sub-nav") and contains(div[contains(@class, "title")]/text(),"{category_path[0]}")]//span[contains(@class, "sub-nav")]/li/a/@href').getall()
-    '''
 
     def get_subsubcategory_urls(self, category_path):
         xpath = f'//div[contains(@class, "sub-nav") and normalize-space(div[contains(@class,"title")])="{category_path[0]}"]' \
@@ -114,8 +33,6 @@ class MainPage(Page):
 
         xpath_urls = xpath + '/@href'
         return self.body.xpath(xpath_urls).getall()
-
-
 
 
 
@@ -175,11 +92,3 @@ class ItemPage(Page):
         )
         return {**specs_1, **specs_2}
 
-    """
-    Suggestion for implementation: Lua Script which clicks through the regions,
-    saving the html each time using splash:html() and returning multiple htmls
-    def get_availability(self):
-        self._extract_table_to_dictionary(
-            row_xpath=
-        )
-    """
