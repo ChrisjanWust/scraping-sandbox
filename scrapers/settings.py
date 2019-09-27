@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from proxiesfetcher import ProxiesFetcher
-
 BOT_NAME = 'items-collector'
 
 SPIDER_MODULES = ['scrapers.spiders']
