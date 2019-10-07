@@ -1,14 +1,11 @@
-import re
 from .page import Page
 import logging
 
 
-class HiddenContentException(Exception):
-    pass
-
 
 class MainPage(Page):
 
+    @Page.enforce_return
     def get_subcategory_urls(self, category_path):
         xpath = f'//div[contains(@class, "sub-nav") and contains(div[contains(@class, "title")]/text(),"{category_path[0]}")]//span[contains(@class, "sub-nav")]/li/a'
         if category_path[1]:
@@ -18,6 +15,8 @@ class MainPage(Page):
 
         return self.body.xpath(xpath).getall()
 
+
+    @Page.enforce_return
     def get_subsubcategory_urls(self, category_path):
         xpath = f'//div[contains(@class, "sub-nav") and normalize-space(div[contains(@class,"title")])="{category_path[0]}"]' \
             f'//span[contains(@class, "sub-nav")]'
@@ -36,22 +35,32 @@ class MainPage(Page):
 
 
 
+
 class SubcategoryPage(Page):
 
+    @Page.enforce_return
     def get_subsubcategory_url(self, subsubcategory):
         return self.body.xpath(f'//div[contains(@class, "mak-category__feature-list")]//a[normalize-space()="{subsubcategory}"]/@href').get()
 
+
+    @Page.enforce_return
     def get_all_subsubcategory_urls(self):
         return self.body.xpath('//div[contains(@class, "mak-category__feature-list")]//a/@href').getall()
 
 
+
+
 class ListingsPage(Page):
 
+    @Page.enforce_return
     def get_item_urls(self):
         return self.body.xpath('//div[contains(@class,"productListContainer")]//div[contains(@class,"product-tile-inner")]//a[1]/@href').getall()
 
+
     def get_next_page_url(self):
         return self.body.xpath('//div[contains(@class,"pagination")]//li[contains(@class,"next")]//a/@href').get()
+
+
 
 
 class ItemPage(Page):
@@ -59,9 +68,12 @@ class ItemPage(Page):
     def get_itemprop(self, property_name):
         return self.body.xpath(f'//span[@itemprop="{property_name}"]/text()').get()
 
+
+    @Page.enforce_return
     def get_title(self):
         texts = self.body.xpath('//div[contains(@class,"product-details")]/span[contains(@class,"name")]/b[contains(@class,"h1")]//text()').getall()
         return self.strip_join(texts)
+
 
     def get_brand_and_name(self):
         brand = self.get_itemprop('brand')
@@ -70,11 +82,16 @@ class ItemPage(Page):
             title = title.replace(brand, 1)
         return brand, title
 
+
+    @Page.enforce_return
     def get_image(self):
         return self.body.xpath('//div[contains(@class,"gallery")]//img/@src').get()
 
+
+    @Page.enforce_return
     def get_category_path(self):
         return self.body.xpath('//ol[contains(@class,"breadcrumb")]/li/a/text()').getall()
+
 
     def get_specs(self):
         # for some reason, there are are 2 formats that specs are displayed in (even in one model)
