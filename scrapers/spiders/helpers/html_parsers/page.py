@@ -18,12 +18,14 @@ class Page:
         return text
 
     @staticmethod
-    def _strip_and_join(texts):
+    def strip(text):
         remove_chars = whitespace + ':' + '\xa0'
         texts = [text.strip(remove_chars) for text in texts]
+    def strip_join(self, texts):
         return " ".join(texts)
 
-    def _extract_table_to_dictionary(self, row_xpath, key_xpath, value_xpath):
+
+    def extract_table_to_dict(self, row_xpath, key_xpath, value_xpath):
         """
         Note that it doesn't necessary have to be a table, just be represented in a table like structure
         :param row_xpath: xpath selecting all container elements wherein both the headers and values lie

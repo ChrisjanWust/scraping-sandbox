@@ -61,7 +61,7 @@ class ItemPage(Page):
 
     def get_title(self):
         texts = self.body.xpath('//div[contains(@class,"product-details")]/span[contains(@class,"name")]/b[contains(@class,"h1")]//text()').getall()
-        return self._strip_and_join(texts)
+        return self.strip_join(texts)
 
     def get_brand_and_name(self):
         brand = self.get_itemprop('brand')
@@ -79,13 +79,13 @@ class ItemPage(Page):
     def get_specs(self):
         # for some reason, there are are 2 formats that specs are displayed in (even in one model)
         # format 1: regular table
-        specs_1 = self._extract_table_to_dictionary(
+        specs_1 = self.extract_table_to_dict(
             row_xpath='//tr[contains(td/@class,"attr")]',
             key_xpath='.//td[contains(@class,"attr")]//text()',
             value_xpath='.//td[2]//text()'
         )
         # format 2: wanna-be-table columns
-        specs_2 = self._extract_table_to_dictionary(
+        specs_2 = self.extract_table_to_dict(
             row_xpath='//div[contains(@class,"content") and @class="content" and contains(div/a/text(),"Details")]//div[contains(@class,"12") and contains(div/@class,"4")]',
             key_xpath='.//div[1]//text()',
             value_xpath='.//div[2]//text()'
