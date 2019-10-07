@@ -12,55 +12,54 @@ Only module required is `scrapy`. I'm specifically running v1.5.1 - anything new
 scrapy crawl makro
 ```
 
-### Task
+### Splash
 
-Write a scraper for [Hirschs](hirschs.co.za) using a similar format to that of the Makro scraper.
+Splash is essentially a headless browser. The reason it's required is for it's Javascript rendering, as Scrapy directly uses the raw result of an HTTP request. JS rendering isn't needed for all sites, but some only render critical information with the JS. It is preferred to use as little SplashRequests as possible because of the increased computation (so on some sites, like Takealot)
 
-The output should be a list of item dictionaries, such as:
+##### Setup
+
+The install setup for Splash is documented here: <https://splash.readthedocs.io/en/latest/install.html>
+
+It's quite simple. First pull the docker container:
 
 ```
-{
-  "model_nr": "58A6100UW",
-  "brand": "HISENSE",
-  "name": " HISENSE   146 cm (58\")   Smart UHD TV ",
-  "url": "https://www.makro.co.za/electronics-computers/televisions/led/-46-117cm-/hisense-146-cm-58-smart-uhd-tv-/p/000000000000370254_EA",
-  "specs": {
-    "Screen Type": "UHD",
-    "3D": "-",
-    "Resolution": "3480 x 2160",
-    "Smart": "Yes",
-    "Clear Motion Ratio(H": "-",
-    "HDMI Inputs": "3",
-    "USB Inputs": "2",
-    "Contrast Ratio": "4000:1",
-    "Smart Interactive": "Yes",
-    "Wi-Fi Ready": "Yes",
-    "Wireless Lan Built I": "Yes",
-    "Bluetooth Technology": "-",
-    "Internet Ready": "Yes",
-    "Skype Ready": "-",
-    "Dongle Included": "-",
-    "Built In Camera": "-",
-    "Built In Microphone": "-",
-    "3D Glasses Included": "-",
-    "Remotes Included": "Yes",
-    "TV Dim With Stand": "1301 x 244 x 821",
-    "TV Dim W/out Stand": "1301 x 74 x 760",
-    "gtin": "6942147447888"
-  },
-  "image_url": "https://www.makro.co.za/sys-master/images/h32/h9f/8904066990110/silo-MIN_370254_EAA_large",
-  "category": [
-    "Home",
-    "Electronics & Computers",
-    "Televisions",
-    "LED",
-    "> 46\" (117cm)"],
-  "pricing_data": {
-    "supplier": "Makro",
-    "sku": "000000000000370254_EA",
-    "price": "7999.00"
-  }
-}
+docker pull scrapinghub/splash
 ```
 
-The data isn't fully cleaned yet, which is fine. The goal, for now, is just to get structured data for further local parsing.
+Note that you might need to add a `sudo` for Linux.
+
+To run the container:
+
+```
+docker run -it -p 8050:8050 --rm scrapinghub/splash
+```
+
+Now Splash is available as a headless browser on `localhost:8050`.
+
+##### Use with Scrapy
+
+Splash has a direct replacement for a `scrapy.Request`, `SplashRequest`:
+
+```
+yield SplashRequest(
+	url,
+	self.parse_result,
+    args={  # optional; parameters passed to Splash HTTP API
+        'wait': 0.5,
+    },
+)
+```
+
+To use this, a few settings need to be set as defined here: <https://github.com/scrapy-plugins/scrapy-splash#usage>
+
+These (except for caching) have already been done in `splash_settings.json`.
+
+We pull them in using
+
+```
+with open('scrapers/splash_settings.json') as f:
+    splash_settings = json.load(f)
+custom_settings = {**custom_settings, **splash_settings
+```
+
+See the *Takealot* spider as example.
