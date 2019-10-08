@@ -9,8 +9,7 @@ class MyIstoreSpider(CustomSpider):
 
     name = 'myistore'
     start_url = 'https://www.myistore.co.za/'
-    category_paths = ["mac","ipad","watch","discover-iphone"]
-    categories = ["mac", "ipad", "watch", "iphone"]    
+    categories = ["Mac", "iPad", "Watch", "iPhone"]
 
     custom_settings = {
         'FEED_URI': file_handler.allocate_output_path(spider_name=name),
@@ -19,12 +18,21 @@ class MyIstoreSpider(CustomSpider):
 
 
     def start_requests(self):
-        
-        for i, category_path in enumerate(self.category_paths):
-            request = scrapy.Request(url=self.start_url+category_path+"/view-all", callback=self.get_each_page)
-            request.cb_kwargs['category'] = self.categories[i]
-            yield request
+        yield scrapy.Request(url=self.start_url, callback=self.parse_main_page)
 
+
+    def parse_main_page(self, response):
+        parser = myistore.MainPage(response)
+        for category in self.categories:
+            url = parser.get_category_url(category)
+            yield scrapy.Request(
+                url=url,
+                callback=self.parse_listings_page,
+                cb_kwargs={'category': category},
+            )
+
+
+    """
     def get_each_page(self, response, category):
         
         page_urls = response.xpath('//ol[contains(@class, "pagination")]/li/a/@href').extract()
@@ -35,29 +43,38 @@ class MyIstoreSpider(CustomSpider):
             request = scrapy.Request(url=page_url, callback=self.parse_listings_page)
             request.cb_kwargs['category'] = category
             yield request
+    """
+
 
     def parse_listings_page(self, response, category):
-        
         parser = myistore.ListingsPage(response)
 
-        item_urls = parser.get_item_urls()
-
-        for item_url in item_urls:
+        for item_url in parser.get_item_urls():
             request = scrapy.Request(url=item_url, callback=self.parse_item_page)
             request.cb_kwargs['category'] = category
             yield request
-    
-    def parse_item_page(self,response, category):
 
+        for page_url in parser.get_page_urls():
+            request = scrapy.Request(url=page_url, callback=self.parse_listings_page)
+            request.cb_kwargs['category'] = category
+            yield request
+
+    
+    def parse_item_page(self, response, category):
         parser = myistore.ItemPage(response)
-        brand, item_name = parser.get_brand_and_name()
-        specs = parser.get_specs()
-        image_url = parser.get_image_url()
 
         pricing_data = {
-            "supplier":"Myistore",
+            "supplier": "Myistore",
             "sku": parser.get_sku(),
             "price": parser.get_price()
         }
 
-        yield({"brand":brand, "item_name":item_name, "category":category, "price":pricing_data, "image_url":image_url, "specs":specs})
+        yield {
+            "brand": 'Apple',
+            "item_name": parser.get_name(),
+            "category": category,
+            "price": pricing_data,
+            "image_url": parser.get_image_url(),
+            "specs": parser.get_specs_2()
+        }
+
