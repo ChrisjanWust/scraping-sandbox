@@ -2,6 +2,7 @@
 from scrapy import Selector
 import re
 from string import whitespace
+from ..replace_special_characters import normalize_special_chars
 
 class Page:
 
@@ -28,6 +29,7 @@ class Page:
         if group_multi_space:
             text = re.sub(r' {2,}', ' ', text)
         text = self.strip(text)
+        text = normalize_special_chars(text)
         return text
 
 
